@@ -1,5 +1,10 @@
 import Database from "@tauri-apps/plugin-sql";
-const db = await Database.load("sqlite:test.db");
+
+
+
+
+const DBURL = "sqlite:D:\\pro\\printease\\test.db";
+const db = await Database.load(DBURL);
 
 async function createTemplatsTable() {
   const r = await db.execute(
@@ -7,7 +12,10 @@ async function createTemplatsTable() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
         path TEXT NOT NULL,
-        description TEXT
+        description TEXT,
+        inUse INTEGER DEFAULT 0,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`
   );
   return r;
