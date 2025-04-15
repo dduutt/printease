@@ -46,8 +46,8 @@
 </template>
 
 <script setup>
-import { Command } from '@tauri-apps/plugin-shell';
 import { ref, reactive, onMounted } from 'vue'
+import { printer } from '../api/printer';
 
 const defaultFormData = {
   labelTemplate: '',
@@ -64,16 +64,6 @@ const labelTemplates = ref([])
 const labelTemplateDatas = ref([])
 const printers = ref([])
 
-async function getPrinters() {
-  let result = await Command.create('get-printers', [
-    "Get-Printer | Select-Object Name | ConvertTo-Json",
-  ]).execute();
-  if (result.code === 0) {
-    let data = JSON.parse(result.stdout);
-    return data.map(item => item.Name);
-  }
-  return [];
-}
 async function print() {
   console.log("print")
 }
@@ -83,7 +73,7 @@ async function searchRemoteLabelData(query) {
 }
 
 onMounted(async () => {
-  printers.value = await getPrinters();
+  printers.value = await printer.list()
 })
 
 </script>
