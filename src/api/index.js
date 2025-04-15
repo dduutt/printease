@@ -1,11 +1,9 @@
-
-
 export async function withMessage(wm = {}) {
   const {
-    successMessage = '操作成功',
-    errorMessage = '操作失败',
-    successType = 'success',
-    errorType = 'error',
+    successMessage = "操作成功",
+    errorMessage = "操作失败",
+    successType = "success",
+    errorType = "error",
     f = async () => {},
   } = wm;
 
@@ -26,7 +24,7 @@ export async function withMessage(wm = {}) {
     });
     console.error(`${f.name} error:`, error);
     return {
-      data: '',
+      data: "",
       status: false,
     };
   }

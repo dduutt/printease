@@ -46,8 +46,10 @@ async function update(template) {
 
 async function getList(searchText = "", currentPage = 1, pageSize = 10) {
   const offset = (currentPage - 1) * pageSize;
+  // 修改SQL查询，添加ROW_NUMBER()函数来生成序号
   const sql =
-    "SELECT *,COUNT(*) OVER() AS totalCount FROM templates WHERE name LIKE $1 ORDER BY id DESC LIMIT $2 OFFSET $3";
+    "SELECT *, COUNT(*) OVER() AS totalCount, ROW_NUMBER() OVER(ORDER BY id DESC) AS rowNum " +
+    "FROM templates WHERE name LIKE $1 ORDER BY id DESC LIMIT $2 OFFSET $3";
   const params = [`%${searchText}%`, pageSize, offset];
   const result = await withMessage({
     successMessage: "获取模板列表成功",
@@ -57,12 +59,16 @@ async function getList(searchText = "", currentPage = 1, pageSize = 10) {
       return r;
     },
   });
+
+  // 处理结果，确保即使没有数据也能返回正确的结构
   const total = result.data[0]?.totalCount || 0;
-  const templates = result.data;
+
   return {
     data: {
-      list: templates,
+      list: result.data,
       total: total,
+      currentPage: currentPage,
+      pageSize: pageSize,
     },
     status: result.status,
   };

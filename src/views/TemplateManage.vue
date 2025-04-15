@@ -3,79 +3,39 @@
     <div class="crud-header">
       <el-row :gutter="20">
         <el-col :span="18">
-          <el-input
-            v-model="searchText"
-            placeholder="请输入搜索关键字"
-            clearable
-            @change="handleSearch"
-          />
+          <el-input v-model="searchText" placeholder="请输入搜索关键字" clearable @change="handleSearch" />
         </el-col>
         <el-col :span="6">
           <div class="flex-end">
-            <el-button type="primary" @click="openDialog('create')"
-              >新增模板</el-button
-            >
+            <el-button type="primary" @click="openDialog('create')">新增模板</el-button>
           </div>
         </el-col>
       </el-row>
     </div>
 
     <!-- 数据表格 -->
-    <el-table
-      :data="tableData"
-      stripe
-      border
-      table-layout="auto"
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="name"
-        label="模板名称"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="description"
-        label="模板描述"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="createdAt"
-        label="创建时间"
-        align="center"
-      ></el-table-column>
+    <el-table :data="tableData" stripe border table-layout="auto" style="width: 100%">
+      <el-table-column label="序号" align="center" prop="rowNum"></el-table-column>
+      <el-table-column prop="name" label="模板名称" align="center"></el-table-column>
+      <el-table-column prop="description" label="模板描述" align="center"></el-table-column>
+      <el-table-column prop="createdAt" label="创建时间" align="center"></el-table-column>
       <el-table-column label="启用" align="center">
         <template #default="scope">
-          <el-switch
-            v-model="scope.row.inUse"
-            :active-value="1"
-            :inactive-value="0"
-            @change="switchChange(scope.row)"
-          />
+          <el-switch v-model="scope.row.inUse" :active-value="1" :inactive-value="0"
+            @change="switchChange(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template #default="scope">
-          <el-button size="small" @click="openDialog('edit', scope.row)"
-            >编辑</el-button
-          >
-          <el-button size="small" type="danger" @click="handleDelete(scope.row)"
-            >删除</el-button
-          >
+          <el-button size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination
-      class="pagination"
-      background
-      :hide-on-single-page="true"
-      :default-page-size="5"
-      :total="total"
-      :page-size="pageSize"
-      :current-page="currentPage"
-      @current-change="handlePageChange"
-    />
+    <el-pagination class="pagination" background :hide-on-single-page="true" :default-page-size="5" :total="total"
+      :page-size="pageSize" :current-page="currentPage" @current-change="handlePageChange" />
     <!-- 编辑对话框 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="60%">
       <el-form :model="formData" :rules="formRules" ref="formRef">
@@ -88,12 +48,7 @@
           </el-button>
         </el-form-item>
         <el-form-item label="模板描述" prop="description">
-          <el-input
-            v-model="formData.description"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入模板描述"
-          />
+          <el-input v-model="formData.description" type="textarea" :rows="3" placeholder="请输入模板描述" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -172,6 +127,8 @@ async function submitForm() {
   if (r.status) {
     // 这里添加实际提交逻辑
     dialogVisible.value = false;
+    // 更新表格数据
+    getTemplateList();
   }
 }
 
@@ -243,7 +200,7 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-.el-button + .el-button {
+.el-button+.el-button {
   margin-left: 10px;
 }
 </style>

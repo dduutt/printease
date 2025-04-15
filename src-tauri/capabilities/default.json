@@ -9,6 +9,16 @@
     "sql:allow-execute",
     "sql:allow-select",
     "sql:allow-load",
-    "dialog:default"
+    "dialog:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "get-printers",
+          "cmd": "powershell",
+          "args": true
+        }
+      ]
+    }
   ]
 }

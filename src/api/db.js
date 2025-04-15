@@ -1,10 +1,12 @@
 import Database from "@tauri-apps/plugin-sql";
+import { resolve } from "@tauri-apps/api/path";
+const basePath = await resolve("..");
 
-
-
-
-const DBURL = "sqlite:D:\\pro\\printease\\test.db";
+const DEV_DBURL = `sqlite:${basePath}\\printease.db`;
+const PRD_DBURL = `sqlite:printease.db`;
+const DBURL = process.env.NODE_ENV === "development" ? DEV_DBURL : PRD_DBURL;
 const db = await Database.load(DBURL);
+
 
 async function createTemplatsTable() {
   const r = await db.execute(
@@ -14,8 +16,8 @@ async function createTemplatsTable() {
         path TEXT NOT NULL,
         description TEXT,
         inUse INTEGER DEFAULT 0,
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        createdAt TIMESTAMP DEFAULT (DATETIME('NOW', 'LOCALTIME')),
+        updatedAt TIMESTAMP DEFAULT (DATETIME('NOW', 'LOCALTIME'))
         )`
   );
   return r;

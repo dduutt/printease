@@ -1,162 +1,101 @@
 <template>
   <div class="common-layout">
-    <el-container>
-      <el-header>
-        <el-form :inline="true" :model="templateConfig" class="templateConfig">
-          <el-row>
-            <el-col :span="6">
-              <el-form-item label="打印模板">
-                <el-select v-model="printTemplate" value-key="id" placeholder="请选择打印模板" clearable>
-                  <el-option v-for="item in printTemplates" :key="item.id" :label="item.name" :value="item.data" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="标签模板">
-                <el-select v-model="labelTemplate" value-key="id" placeholder="请选择标签模板" clearable>
-                  <el-option v-for="item in labelTemplates" :key="item.id" :label="item.name" :value="item.data" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="3">
-              <el-form-item label="数据索引">
-                <el-select v-model="templateData" multiple filterable remote reserve-keyword placeholder="请输入关键字"
-                  remote-show-suffix :remote-method="remoteTemplateDataSearch">
-                  <el-option v-for="item in remoteTemplateDatas" :key="item.id" :label="item.dataIndex"
-                    :value="item.data" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="2">
-              <el-form-item>
-                <el-button type="primary" @click="print">打印</el-button>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="5">
-              <el-form-item label="打印份数">
-                <el-input-number v-model="templateConfig.copies" :min="1" :max="100" :step="1" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="5">
-              <el-form-item label="标签数量">
-                <el-input-number v-model="templateConfig.num" :min="1" :max="100" :step="1" />
-              </el-form-item>
-            </el-col>
+    <el-form :inline="true" :model="formData" class="printForm">
+      <el-row>
+        <el-col :span="8">
+          <el-form-item label="打印模板" prop="labelTemplate">
+            <el-select v-model="formData.labelTemplate" filterable placeholder="请选择打印模板">
+              <el-option v-for="item in labelTemplates" :key="item.id" :label="item.name" :value="item.data" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="索引" prop="labelData">
+            <el-select v-model="formData.labelData" remote :remote-method="searchRemoteLabelData" filterable
+              placeholder="Select">
+              <el-option v-for="item in labelTemplateDatas" :key="item.id" :label="item.name" :value="item.data" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="打印机" prop="printer">
+            <el-select v-model="formData.printer" placeholder="请选择打印机">
+              <el-option v-for="item in printers" :key="item" :label="item" :value="item" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col>
+          <el-form-item label="副本数量" prop="copies">
+            <el-input-number v-model="formData.copies" :min="1" :max="100" />
+          </el-form-item>
+        </el-col>
+        <el-col>
+          <el-form-item label="标签数量" prop="num">
+            <el-input-number v-model="formData.num" :min="1" :max="100" />
+          </el-form-item>
+        </el-col>
+        <el-col>
+          <el-form-item>
+            <el-button type="primary" @click="print">Query</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
 
-            <el-col :span="5">
-              <el-form-item label="标签数量">
-                <el-input-number v-model="templateConfig.num" :min="1" :max="100" :step="1" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="5">
-              <el-form-item label="标签数量">
-                <el-input-number v-model="templateConfig.num" :min="1" :max="100" :step="1" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-      </el-header>
-      <el-main>Main</el-main>
-    </el-container>
   </div>
 </template>
 
 <script setup>
+import { Command } from '@tauri-apps/plugin-shell';
+import { ref, reactive, onMounted } from 'vue'
 
-import { ref, reactive } from 'vue'
-
-// 默认标签模板数据
-const defaultTemplateData = [
-  {
-    label: "生产日期",
-    key: "生产日期",
-    value: "2023-01-01",
-  },
-  {
-    label: "规格",
-    key: "规格",
-    value: "TR 1x0.16",
-  },
-]
-
-const defaultRemoteTemplateDatas = [
-  {
-    id: 1,
-    name: "模板名称",
-    dataIndex: '1',
-    data: defaultTemplateData
-  },
-  {
-    id: 2,
-    name: "模板名称",
-    dataIndex: '11',
-    data: defaultTemplateData
-  },
-  {
-    id: 3,
-    name: "模板名称",
-    dataIndex: '111',
-    data: defaultTemplateData
-  },
-]
-
-const defaultPrintTemplates = [
-  {
-    id: 1,
-    name: '模板1',
-    data: '1'
-  },
-  {
-    id: 2,
-    name: '模板2',
-    data: '2'
-  },
-]
-
-const defaultLabelTemplates = [
-  {
-    id: 1,
-    name: '标签1',
-    data: '路径1'
-  },
-  {
-    id: 2,
-    name: '标签2',
-    data: '路径2'
-  },
-]
-
-const defaultTemplateConfig = {
-  copies: 1,
-  num: 1,
+const defaultFormData = {
+  labelTemplate: '',
+  labelData: {},
+  printer: '',
+  defaultPrintConfig: {
+    copies: 1,
+    num: 1
+  }
 }
 
+const formData = reactive({ ...defaultFormData })
+const labelTemplates = ref([])
+const labelTemplateDatas = ref([])
+const printers = ref([])
 
-const templateConfig = reactive(defaultTemplateConfig)
-const printTemplates = reactive(defaultPrintTemplates)
-const labelTemplates = reactive(defaultLabelTemplates)
-const remoteTemplateDatas = ref(defaultRemoteTemplateDatas)
-const printTemplate = ref("")
-const labelTemplate = ref("")
-// 标签模板数据
-const templateData = ref(defaultTemplateData)
-
-
-function print() {
-  alert("打印")
+async function getPrinters() {
+  let result = await Command.create('get-printers', [
+    "Get-Printer | Select-Object Name | ConvertTo-Json",
+  ]).execute();
+  if (result.code === 0) {
+    let data = JSON.parse(result.stdout);
+    return data.map(item => item.Name);
+  }
+  return [];
+}
+async function print() {
+  console.log("print")
 }
 
-function remoteTemplateDataSearch(query = "") {
-  console.log("remoteTemplateDataSearch", query)
+async function searchRemoteLabelData(query) {
+  console.log("searchRemoteLabelData")
 }
+
+onMounted(async () => {
+  printers.value = await getPrinters();
+})
 
 </script>
 
 <style scoped>
-.templateConfig .el-form-item {
-  width: 90%;
+.common-layout {
+  height: 100%;
+  display: flex;
+  width: 100%;
+}
 
+.printForm .el-form-item {
+  width: 90%;
 }
 </style>
