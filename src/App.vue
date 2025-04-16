@@ -1,94 +1,10 @@
 <template>
   <el-container>
     <el-header class="app-header">
-      <div class="header-content">
-        <div class="logo">
-          <img src="./assets/vue.svg" alt="Logo" style="height: 36px">
-          <span>PrintEase</span>
-        </div>
-        <el-menu
-          mode="horizontal"
-          :default-active="$route.path"
-          background-color="#fff"
-          text-color="#606266"
-          active-text-color="#409EFF"
-          class="nav-menu">
-          <el-menu-item index="/label-print">
-            <router-link to="/label-print">标签打印</router-link>
-          </el-menu-item>
-          <el-menu-item index="/print-history">
-            <router-link to="/print-history">打印记录</router-link>
-          </el-menu-item>
-          <el-menu-item index="/template-manage">
-            <router-link to="/template-manage">模板管理</router-link>
-          </el-menu-item>
-        </el-menu>
-      </div>
+      <Header />
     </el-header>
     <el-main class="main-container">
       <router-view></router-view>
     </el-main>
   </el-container>
 </template>
-
-<script setup>
-import { useRoute } from 'vue-router'
-const $route = useRoute()
-</script>
-
-<style scoped>
-.app-header {
-  /* box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1); */
-  padding: 0 20px;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  margin-right: 40px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #303133;
-}
-
-.logo img {
-  margin-right: 10px;
-}
-
-.nav-menu {
-  flex: 1;
-  border-bottom: none;
-}
-
-.nav-menu :deep(.el-menu-item) {
-  font-size: 16px;
-  padding: 0 20px !important;
-  height: 60px;
-  line-height: 60px;
-  transition: all 0.3s;
-}
-
-.nav-menu :deep(.el-menu-item.is-active) {
-  border-bottom: 2px solid #409EFF;
-}
-
-.main-container {
-  width: 100%;
-  height: calc(90vh - 60px);
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 4px;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-</style>
