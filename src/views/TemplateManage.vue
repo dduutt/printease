@@ -61,7 +61,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, nextTick } from "vue";
-import { open } from "@tauri-apps/plugin-dialog";
+import { getSelectedFile } from "../api/fileSelector";
 import { templateAPI } from "../api/template";
 
 const defaultFormData = {
@@ -146,19 +146,10 @@ function handleSearch() {
 // 打开文件选择器
 async function openFileSelector() {
   // 这里添加文件选择器逻辑
-  const path = await open({
-    multiple: false,
-    defaultPath: "",
-    title: "选择模板文件",
-    filters: [
-      {
-        name: "Excel",
-        extensions: ["xlsx"],
-      },
-    ],
-  });
-  console.log(path);
-  formData.path = path;
+  const path = await getSelectedFile("Excel", ["xlsx"]);
+  if (path) {
+    formData.path = path;
+  }
 }
 
 // 获取模板列表

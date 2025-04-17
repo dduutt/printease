@@ -1,4 +1,5 @@
 <template>
+
   <div class="common-layout">
     <el-form :inline="true" :model="formData" label-position="top" class="printForm">
       <el-row>
@@ -9,15 +10,24 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
-          <el-form-item label="标签模板" prop="labelTemplate">
-            <el-select v-model="formData.labelTemplates" remote :remote-method="searchRemoteLabelData" filterable
-              placeholder="Select">
-              <el-option v-for="item in labelTemplateDatas" :key="item.id" :label="item.name" :value="item.data" />
-            </el-select>
+        <el-col :span="10">
+          <el-form-item label="标签模板" prop="labelTemplatePath">
+            <el-button text type="primary" @click="openFileSelector">
+              {{ formData.labelTemplatePath || "选择模板文件" }}
+            </el-button>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="3">
+          <el-form-item label="打印副本" prop="copies">
+            <el-input-number v-model="formData.copies" :min="1" :max="100" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="3">
+          <el-form-item label="打印数量" prop="num">
+            <el-input-number v-model="formData.num" :min="1" :max="100" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="7">
           <el-form-item label="索引" prop="labelData">
             <el-select v-model="formData.labelData" remote :remote-method="searchRemoteLabelData" filterable
               placeholder="Select">
@@ -32,47 +42,34 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
+          <el-form-item label="打印" label-position="left">
+            <el-button type="primary" @click="resetLabelData">重置</el-button>
+            <el-button type="primary" @click="print">打印</el-button>
+          </el-form-item>
+        </el-col>
+        <el-col :span="7">
           <el-form-item label="批次信息" prop="batch">
             <el-input v-model="formData.batch" />
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item label="位数" prop="runningNumberLength">
             <el-input-number v-model="formData.runningNumberLength" :min="1" :max="6" />
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item label="流水号" prop="runningNumber">
             <el-input-number v-model="formData.runningNumber" @input="handleRunningNumberInput" :min="1"
               :max="Math.pow(10, formData.runningNumberLength) - 1" />
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="9">
           <el-form-item label="批次号" prop="batchCode">
             <el-input v-model="batchCode" disabled />
           </el-form-item>
         </el-col>
-        <el-col :span="8">
-          <el-form-item label="副本" prop="copies">
-            <el-input-number v-model="formData.copies" :min="1" :max="100" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="数量" prop="num">
-            <el-input-number v-model="formData.num" :min="1" :max="100" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="4">
-          <el-form-item>
-            <el-button type="primary" @click="resetLabelData">重置</el-button>
-          </el-form-item>
-        </el-col>
-        <el-col :span="4">
-          <el-form-item>
-            <el-button type="primary" @click="print">打印</el-button>
-          </el-form-item>
-        </el-col>
+
         <el-col :span="8" v-for="item in formData.labelData">
           <el-form-item :label="item.name" :prop="item.key">
             <el-input v-model="item.value" />
@@ -86,6 +83,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
 import { printer } from "../api/printer";
+import { getSelectedFile } from "../api/fileSelector";
 
 const defaultFormData = {
   labelTemplate: "",
@@ -152,7 +150,15 @@ async function resetLabelData() {
 }
 
 function handleRunningNumberInput(value) {
-  console.log(value);
+  runningNumberCounter.value = value;
+}
+
+async function openFileSelector() {
+  // 这里添加文件选择器逻辑
+  const path = await getSelectedFile("BTW", ["btw"]);
+  if (path) {
+    formData.labelTemplatePath = path;
+  }
 }
 
 onMounted(async () => {
